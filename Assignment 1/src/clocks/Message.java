@@ -1,10 +1,10 @@
 package clocks;
 
-public class Message<A> {
-	private A msg;
+public class Message{
+	private String msg;
 	public ScalarClock timestamp;
 	
-	public Message(A m, ScalarClock t){
+	public Message(String m, ScalarClock t){
 		this.msg = m;
 		this.timestamp = t;
 	}
