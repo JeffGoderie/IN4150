@@ -15,6 +15,7 @@ public class Client {
 		RemoteInterf remote = (RemoteInterf) registry.lookup(Constant.RMI_ID);
 		System.out.println(remote.isLoginValid("al"));
 		System.out.println(remote.isLoginValid("test"));
-		
+		RemoteInterf remote2 = (RemoteInterf) registry.lookup("test2");
+		System.out.println(remote2.isLoginValid("test"));
 	}
 }

@@ -5,13 +5,17 @@ import interf.RemoteInterf;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class RemoteImpl extends UnicastRemoteObject implements RemoteInterf {
+import processes.MessageQueue;
+import clocks.Message;
+
+public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInterf {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static MessageQueue msg_q;
 
-	protected RemoteImpl() throws RemoteException {
+	protected RemoteInterfImpl() throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -22,5 +26,10 @@ public class RemoteImpl extends UnicastRemoteObject implements RemoteInterf {
 			return true;
 		return false;
 	}
-
+	/*
+	@Override
+	public Message sendNext() {
+		return msg_q.message_queue.poll();
+	}
+*/
 }
