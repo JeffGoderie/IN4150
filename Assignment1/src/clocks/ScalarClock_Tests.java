@@ -6,7 +6,7 @@ public class ScalarClock_Tests {
 		ScalarClock sc2 = new ScalarClock(3,4);
 		System.out.println(sc1.smallerThan(sc2));
 		System.out.println(sc1);
-		Message<String> msg = new Message("hello", sc1);
+		Message msg = new Message("hello", sc1);
 		System.out.println(msg);
 	}
 }

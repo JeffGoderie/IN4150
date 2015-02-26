@@ -15,5 +15,4 @@ public class RMIserver {
 		registry.bind(Constant.RMI_ID, impl); 
 		System.out.println("started");
 	}
-	
 }

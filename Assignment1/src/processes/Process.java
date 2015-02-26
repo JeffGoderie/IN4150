@@ -27,6 +27,6 @@ public class Process {
 	}
 	
 	public void acknowledge(){
-		Ack a = new Ack();
+		//Ack a = new Ack(null);
 	}
 }
