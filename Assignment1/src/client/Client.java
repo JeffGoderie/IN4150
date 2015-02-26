@@ -12,10 +12,14 @@ public class Client {
 
 	public static void main(String[] args) throws RemoteException, NotBoundException{
 		Registry registry = LocateRegistry.getRegistry("localhost", Constant.RMI_PORT);
-		RemoteInterf remote = (RemoteInterf) registry.lookup(Constant.RMI_ID);
-		System.out.println(remote.isLoginValid("al"));
-		System.out.println(remote.isLoginValid("test"));
-		RemoteInterf remote2 = (RemoteInterf) registry.lookup("test2");
+		
+		Constant.RMI_IDS = registry.list();
+		
+		RemoteInterf remote1 = (RemoteInterf) registry.lookup(Constant.RMI_IDS[0]);
+		RemoteInterf remote2 = (RemoteInterf) registry.lookup(Constant.RMI_IDS[1]);
+		
+		System.out.println(remote1.isLoginValid("test"));
+		System.out.println(remote2.isLoginValid("al"));
 		System.out.println(remote2.isLoginValid("test"));
 	}
 }
