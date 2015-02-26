@@ -1,11 +1,11 @@
-package com.test;
+package server;
+
+import interf.Constant;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
-import com.interf.test.Constant;
 
 public class RMIserver {
 

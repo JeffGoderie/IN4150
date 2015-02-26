@@ -1,11 +1,11 @@
-package com.test;
+package server;
+
+import interf.RemoteInterf;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import com.interf.test.TestRemote;
-
-public class RemoteImpl extends UnicastRemoteObject implements TestRemote {
+public class RemoteImpl extends UnicastRemoteObject implements RemoteInterf {
 	/**
 	 * 
 	 */
