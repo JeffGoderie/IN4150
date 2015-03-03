@@ -13,8 +13,10 @@ public class RMIserver {
 
 	public static void main(String[] args) throws RemoteException, AlreadyBoundException, NotBoundException{
 		Registry registry = LocateRegistry.createRegistry(Constant.RMI_PORT);
-		registry.bind(Constant.RMI_ID, new RemoteInterfImpl());
-		registry.bind("test2", new RemoteInterfImpl());
+		registry.bind("CLient1", new RemoteInterfImpl());
+		registry.bind("CLient2", new RemoteInterfImpl());
+		//registry.bind("t3", new RemoteInterfImpl());
+		//registry.bind("t4", new RemoteInterfImpl());
 		setRegistry();
 		System.out.println("started");
 	}
@@ -28,6 +30,7 @@ public class RMIserver {
 		for(int i=0; i<RMI_IDS.length; i++){
 			RMI_IDS[i].setRegister(RMI_IDS);
 			RMI_IDS[i].setName(registry.list()[i]);
+			RMI_IDS[i].setId(i+1);
 		}
 	}
 }

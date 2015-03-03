@@ -1,6 +1,12 @@
 package clocks;
 
-public class ScalarClock {
+import java.io.Serializable;
+
+public class ScalarClock implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2632119310190982463L;
 	int Time;
 	int ProcessId;
 	
@@ -10,13 +16,16 @@ public class ScalarClock {
 	}
 	
 	public boolean smallerThan(ScalarClock sc2){
-		if (this.Time < sc2.Time){
+		if(sc2==null){
 			return true;
 		}
-		else if (this.Time == sc2.Time && this.ProcessId < sc2.ProcessId){
+		else if (this.Time < sc2.Time){
 			return true;
 		}
-		else {
+		else if (this.Time == sc2.Time && this.ProcessId <= sc2.ProcessId){
+			return true;
+		}
+		else{
 			return false;
 		}
 	}

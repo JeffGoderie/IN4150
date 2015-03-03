@@ -1,6 +1,12 @@
 package clocks;
 
-public class Message{
+import java.io.Serializable;
+
+public class Message implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7074103411662207182L;
 	private String msg;
 	public ScalarClock timestamp;
 	
@@ -12,6 +18,6 @@ public class Message{
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "Message: " + msg.toString() + "\n" + timestamp.toString() + "\n";
+		return msg.toString();
 	}
 }

@@ -9,4 +9,16 @@ public class MessageQueue {
 	public MessageQueue(){
 		message_queue = new PriorityQueue<Message>(100, new MessageComparator());
 	}
+	
+	public Message peek(){
+		return message_queue.peek();
+	}
+	
+	public void poll(){
+		message_queue.poll();
+	}
+	
+	public void add(Message msg){
+		message_queue.add(msg);
+	}
 }
