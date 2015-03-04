@@ -3,6 +3,10 @@ package server;
 import interf.Constant;
 import interf.RemoteInterf;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -11,10 +15,18 @@ import java.rmi.registry.Registry;
 
 public class RMIserver {
 
-	public static void main(String[] args) throws RemoteException, AlreadyBoundException, NotBoundException{
+	public static void main(String[] args) throws AlreadyBoundException, NotBoundException, IOException{
 		Registry registry = LocateRegistry.createRegistry(Constant.RMI_PORT);
-		registry.bind("CLient1", new RemoteInterfImpl());
-		registry.bind("CLient2", new RemoteInterfImpl());
+		
+		BufferedReader br = new BufferedReader(new FileReader("tests/two_clients.txt"));
+		String line = "";
+		while ((line = br.readLine()) != null) {
+			registry.bind(line, new RemoteInterfImpl());
+		}
+		br.close();
+		
+		//registry.bind("CLient1", new RemoteInterfImpl());
+		//registry.bind("CLient2", new RemoteInterfImpl());
 		//registry.bind("t3", new RemoteInterfImpl());
 		//registry.bind("t4", new RemoteInterfImpl());
 		setRegistry();
