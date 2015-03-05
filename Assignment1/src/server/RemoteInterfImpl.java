@@ -43,6 +43,7 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		if(msg_q.peek()==null){
 			return "";
 		}
+		System.out.println("Broadcasting Message: " + msg_q.peek() + " from " + this.name);
 		for(int i=0; i<RD.length; i++){
 			RemoteInterf RDi = RD[i];
 			new Thread ( () -> {			
@@ -55,12 +56,19 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 			}).start();
 			
 		}
+		int i = 0;
 		while(this.receiveCount < RD.length*RD.length){
+			i++;
 			Thread.sleep(100);
+			if(i==100){
+				break;
+			}
 		}
 		this.receiveCount = 0;
+		System.out.println("Ack_count: " + ack_count);
 		if(this.ack_count==RD.length){
 			output = "Message: '"+msg_q.peek()+"' has been delivered.";
+			System.out.println(output);
 			msg_q.poll();
 			this.ack_count = 0;
 		}
@@ -72,9 +80,6 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	}
 	
 	public void receive(Message msg, RemoteInterf origin) throws RemoteException{
-		System.out.println(name + " has received message " + msg + " from " + origin.getName());
-		System.out.println("Head: "+ this.getHead());
-		System.out.println("Message: "+ msg.timestamp.toString());
 		if(msg.timestamp.smallerThan(this.getHead())){
 			for(int i=0; i<RD.length; i++){
 				RemoteInterf RDi = RD[i];
@@ -93,7 +98,6 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		}
 		else{
 			origin.setRC();
-			System.out.println("Error******* " + msg);
 		}
 	}
 	
@@ -114,8 +118,6 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		if(this.getName().equals(origin.getName())){
 			origin.setAck();
 		}
-
-		System.out.println(name + " has received acknowledgement for message " + msg + " from " + origin.getName());
 	}
 	
 	@Override

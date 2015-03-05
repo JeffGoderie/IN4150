@@ -4,8 +4,11 @@ import interf.Constant;
 import interf.RemoteInterf;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -14,6 +17,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client {
 	static int num_messages=0;
@@ -33,27 +37,21 @@ public class Client {
 		totalOrder();
 	}
 	
-	public static void totalOrder() throws RemoteException, NotBoundException, InterruptedException, FileNotFoundException, UnsupportedEncodingException{
+	public static void totalOrder() throws NotBoundException, InterruptedException, IOException{
 		Registry registry = LocateRegistry.getRegistry("localhost", Constant.RMI_PORT);
 		RemoteInterf[] RMI_IDS = new RemoteInterf[registry.list().length];
 		for(int i=0; i<registry.list().length; i++){
 			RMI_IDS[i] = (RemoteInterf) registry.lookup(registry.list()[i]);
 		}
-		PrintWriter pw = new PrintWriter("delivered_messages.txt", "UTF-8");
-		CountDownLatch doneSignal = new CountDownLatch(RMI_IDS.length);
-		
-		for(int j=0;j<num_messages;j++){
+		AtomicInteger runs = new AtomicInteger(num_messages);
+		while(runs.get()>0){
 			for(int i=0; i<RMI_IDS.length; i++){
 				RemoteInterf RDi = RMI_IDS[i];
-				
 				new Thread ( () -> {					
 					try {
 						String output = RDi.broadcast();
-						doneSignal.countDown();
-						if(!output.equals("")){
-							System.out.println("writing: "+output+" to file");
-							pw.append(output+"\n");
-							pw.flush();
+						if (!output.equals("")){
+							runs.getAndDecrement();
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -63,8 +61,5 @@ public class Client {
 				}).start();
 			}
 		}
-		doneSignal.await();
-		pw.close();
-		
 	}
 }
