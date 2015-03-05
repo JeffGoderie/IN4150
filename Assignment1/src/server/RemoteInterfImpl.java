@@ -60,7 +60,7 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		while(this.receiveCount < RD.length*RD.length){
 			i++;
 			Thread.sleep(100);
-			if(i==100){
+			if(i==5){
 				break;
 			}
 		}

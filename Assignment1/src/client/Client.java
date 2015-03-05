@@ -43,22 +43,25 @@ public class Client {
 		for(int i=0; i<registry.list().length; i++){
 			RMI_IDS[i] = (RemoteInterf) registry.lookup(registry.list()[i]);
 		}
-		AtomicInteger runs = new AtomicInteger(num_messages);
-		while(runs.get()>0){
+		
+		for(int j=0; j<num_messages; j++){
+			AtomicInteger runs = new AtomicInteger(num_messages);
 			for(int i=0; i<RMI_IDS.length; i++){
 				RemoteInterf RDi = RMI_IDS[i];
 				new Thread ( () -> {					
 					try {
 						String output = RDi.broadcast();
-						if (!output.equals("")){
-							runs.getAndDecrement();
-						}
+						runs.getAndDecrement();
+
 					} catch (Exception e) {
 						e.printStackTrace();
 		 	 		}
 				
 				
 				}).start();
+			}
+			while(runs.get()!=0){
+				Thread.sleep(1);
 			}
 		}
 	}
