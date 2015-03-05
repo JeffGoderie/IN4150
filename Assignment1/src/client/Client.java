@@ -45,11 +45,12 @@ public class Client {
 		}
 		
 		for(int j=0; j<num_messages; j++){
-			AtomicInteger runs = new AtomicInteger(num_messages);
+			AtomicInteger runs = new AtomicInteger(RMI_IDS.length);
 			for(int i=0; i<RMI_IDS.length; i++){
 				RemoteInterf RDi = RMI_IDS[i];
 				new Thread ( () -> {					
 					try {
+						
 						String output = RDi.broadcast();
 						runs.getAndDecrement();
 

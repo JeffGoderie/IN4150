@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import processes.MessageQueue;
 import clocks.Message;
@@ -21,8 +22,8 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	private MessageQueue msg_q;
 	private RemoteInterf[] RD;
 	private int ack_count;
-	
-	private int receiveCount = 0;
+	private AtomicInteger Rec;
+	private AtomicInteger Ack;
 	
 	protected RemoteInterfImpl() throws RemoteException {
 		super();
@@ -43,29 +44,23 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		if(msg_q.peek()==null){
 			return "";
 		}
-		System.out.println("Broadcasting Message: " + msg_q.peek() + " from " + this.name);
+		Rec = new AtomicInteger(RD.length);
 		for(int i=0; i<RD.length; i++){
 			RemoteInterf RDi = RD[i];
 			new Thread ( () -> {			
 				try {
 					//Thread.sleep(10000);
 					RDi.receive(msg_q.peek(), this);
+					Rec.getAndDecrement();
 				} catch (Exception e) {
 					e.printStackTrace();
 	 	 		}		
 			}).start();
 			
 		}
-		int i = 0;
-		while(this.receiveCount < RD.length*RD.length){
-			i++;
+		while(this.Rec.get() > 0){
 			Thread.sleep(100);
-			if(i==5){
-				break;
-			}
 		}
-		this.receiveCount = 0;
-		System.out.println("Ack_count: " + ack_count);
 		if(this.ack_count==RD.length){
 			output = "Message: '"+msg_q.peek()+"' has been delivered.";
 			System.out.println(output);
@@ -75,19 +70,19 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		else{
 			this.ack_count = 0;
 		}
-		System.out.println("Broadcast complete");
 		return output;
 	}
 	
-	public void receive(Message msg, RemoteInterf origin) throws RemoteException{
+	public void receive(Message msg, RemoteInterf origin) throws RemoteException, InterruptedException{
+		Ack = new AtomicInteger(RD.length);
 		if(msg.timestamp.smallerThan(this.getHead())){
 			for(int i=0; i<RD.length; i++){
 				RemoteInterf RDi = RD[i];
 				new Thread ( () -> {
 				
 					try {
-						//Thread.sleep(10000);
 						RDi.acknowledge(msg, origin);
+						Ack.getAndDecrement();
 					} catch (Exception e) {
 						e.printStackTrace();
 		 	 		}
@@ -97,7 +92,10 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 			}
 		}
 		else{
-			origin.setRC();
+			Ack.getAndDecrement();
+		}
+		while(Ack.get()>0){
+			Thread.sleep(100);
 		}
 	}
 	
@@ -114,7 +112,6 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 
 	@Override
 	public void acknowledge(Message msg, RemoteInterf origin) throws RemoteException {
-		origin.setRC();
 		if(this.getName().equals(origin.getName())){
 			origin.setAck();
 		}
@@ -125,13 +122,6 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		this.ack_count++;
 	}
 
-	public void setBrC(){
-	}
-	
-	public void setRC(){
-		this.receiveCount++;
-	}
-	
 	@Override
 	public void setName(String n) throws RemoteException {
 		// TODO Auto-generated method stub

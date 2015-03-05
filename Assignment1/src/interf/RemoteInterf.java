@@ -12,10 +12,6 @@ public interface RemoteInterf extends Remote{
 	
 	public void setAck() throws RemoteException;
 	
-	public void setBrC() throws RemoteException;
-	
-	public void setRC() throws RemoteException;
-	
 	public void setName(String n) throws RemoteException;
 	
 	public String getName() throws RemoteException;
@@ -28,7 +24,7 @@ public interface RemoteInterf extends Remote{
 	
 	public String broadcast() throws RemoteException, InterruptedException, FileNotFoundException,UnsupportedEncodingException;
 	
-	public void receive(Message msg, RemoteInterf origin) throws RemoteException;
+	public void receive(Message msg, RemoteInterf origin) throws RemoteException, InterruptedException;
 
 	public void acknowledge(Message msg, RemoteInterf origin) throws RemoteException;
 	
