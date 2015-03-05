@@ -4,6 +4,7 @@ import interf.RemoteInterf;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.CountDownLatch;
 
 import processes.MessageQueue;
 import clocks.Ack;
@@ -21,6 +22,9 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	private RemoteInterf[] RD;
 	private int ack_count;
 	
+	private int broadcastCount = 0;
+	private int receiveCount = 0;
+	
 	protected RemoteInterfImpl() throws RemoteException {
 		super();
 		this.msg_q = new MessageQueue();
@@ -35,13 +39,28 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	}
 	
 	@Override
-	public void broadcast() throws RemoteException {
+	public void broadcast() throws RemoteException, InterruptedException {
 		// TODO Auto-generated method stub
-		
+			
 		for(int i=0; i<RD.length; i++){
 			RemoteInterf RDi = RD[i];
-			RDi.receive(msg_q.peek(), this);
+			new Thread ( () -> {
+				
+				try {
+					//Thread.sleep(10000);
+					RDi.receive(msg_q.peek(), this);
+				} catch (Exception e) {
+					e.printStackTrace();
+	 	 		}
+			
+			
+			}).start();
+			
 		}
+		while(this.receiveCount < RD.length*RD.length){
+			Thread.sleep(100);
+		}
+		this.receiveCount = 0;
 		if(this.ack_count==RD.length){
 			msg_q.poll();
 			this.ack_count = 0;
@@ -49,6 +68,7 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		else{
 			this.ack_count = 0;
 		}
+		System.out.println("Broadcast complete");
 	}
 	
 	public void receive(Message msg, RemoteInterf origin) throws RemoteException{
@@ -58,13 +78,23 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		if(msg.timestamp.smallerThan(this.getHead())){
 			for(int i=0; i<RD.length; i++){
 				RemoteInterf RDi = RD[i];
-				RDi.acknowledge(msg, origin);
+				new Thread ( () -> {
+				
+					try {
+						//Thread.sleep(10000);
+						RDi.acknowledge(msg, origin);
+					} catch (Exception e) {
+						e.printStackTrace();
+		 	 		}
+				
+				
+				}).start();
 			}
 		}
 		else{
-			System.out.println("Error******* " + name);
+			origin.setRC();
+			System.out.println("Error******* " + msg);
 		}
-
 	}
 	
 	public ScalarClock getHead() throws RemoteException{
@@ -82,6 +112,7 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	@Override
 	public void acknowledge(Message msg, RemoteInterf origin) throws RemoteException {
 		// TODO Auto-generated method stub
+		origin.setRC();
 		if(this.getName().equals(origin.getName())){
 			origin.setAck();
 		}
@@ -92,9 +123,16 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	@Override
 	public void setAck(){
 		this.ack_count++;
-		System.out.println(this.ack_count);
 	}
 
+	public void setBrC(){
+		this.broadcastCount++;
+	}
+	
+	public void setRC(){
+		this.receiveCount++;
+	}
+	
 	@Override
 	public void setName(String n) throws RemoteException {
 		// TODO Auto-generated method stub
