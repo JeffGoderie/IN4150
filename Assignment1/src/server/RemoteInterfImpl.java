@@ -2,12 +2,12 @@ package server;
 
 import interf.RemoteInterf;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.concurrent.CountDownLatch;
 
 import processes.MessageQueue;
-import clocks.Ack;
 import clocks.Message;
 import clocks.ScalarClock;
 
@@ -22,7 +22,6 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	private RemoteInterf[] RD;
 	private int ack_count;
 	
-	private int broadcastCount = 0;
 	private int receiveCount = 0;
 	
 	protected RemoteInterfImpl() throws RemoteException {
@@ -39,21 +38,20 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	}
 	
 	@Override
-	public void broadcast() throws RemoteException, InterruptedException {
-		// TODO Auto-generated method stub
-			
+	public String broadcast() throws RemoteException, InterruptedException, FileNotFoundException, UnsupportedEncodingException {		
+		String output="";
+		if(msg_q.peek()==null){
+			return "";
+		}
 		for(int i=0; i<RD.length; i++){
 			RemoteInterf RDi = RD[i];
-			new Thread ( () -> {
-				
+			new Thread ( () -> {			
 				try {
 					//Thread.sleep(10000);
 					RDi.receive(msg_q.peek(), this);
 				} catch (Exception e) {
 					e.printStackTrace();
-	 	 		}
-			
-			
+	 	 		}		
 			}).start();
 			
 		}
@@ -62,6 +60,7 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		}
 		this.receiveCount = 0;
 		if(this.ack_count==RD.length){
+			output = "Message: '"+msg_q.peek()+"' has been delivered.";
 			msg_q.poll();
 			this.ack_count = 0;
 		}
@@ -69,6 +68,7 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 			this.ack_count = 0;
 		}
 		System.out.println("Broadcast complete");
+		return output;
 	}
 	
 	public void receive(Message msg, RemoteInterf origin) throws RemoteException{
@@ -105,13 +105,11 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	}
 	
 	public void setRegister(RemoteInterf[] RDS) throws RemoteException{
-		// TODO Auto-generated method stub
 		this.RD = RDS;
 	}
 
 	@Override
 	public void acknowledge(Message msg, RemoteInterf origin) throws RemoteException {
-		// TODO Auto-generated method stub
 		origin.setRC();
 		if(this.getName().equals(origin.getName())){
 			origin.setAck();
@@ -126,7 +124,6 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	}
 
 	public void setBrC(){
-		this.broadcastCount++;
 	}
 	
 	public void setRC(){

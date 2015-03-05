@@ -1,11 +1,10 @@
 package interf;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.concurrent.CountDownLatch;
 
-import server.RemoteInterfImpl;
-import clocks.Ack;
 import clocks.Message;
 import clocks.ScalarClock;
 
@@ -27,7 +26,7 @@ public interface RemoteInterf extends Remote{
 	
 	public boolean isLoginValid(String username) throws RemoteException;
 	
-	public void broadcast() throws RemoteException, InterruptedException;
+	public String broadcast() throws RemoteException, InterruptedException, FileNotFoundException,UnsupportedEncodingException;
 	
 	public void receive(Message msg, RemoteInterf origin) throws RemoteException;
 

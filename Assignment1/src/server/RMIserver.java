@@ -4,7 +4,6 @@ import interf.Constant;
 import interf.RemoteInterf;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
@@ -12,7 +11,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.concurrent.CountDownLatch;
 
 public class RMIserver {
 
@@ -26,10 +24,6 @@ public class RMIserver {
 		}
 		br.close();
 		
-		//registry.bind("CLient1", new RemoteInterfImpl());
-		//registry.bind("CLient2", new RemoteInterfImpl());
-		//registry.bind("t3", new RemoteInterfImpl());
-		//registry.bind("t4", new RemoteInterfImpl());
 		setRegistry();
 		System.out.println("started");
 	}
