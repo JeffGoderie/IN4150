@@ -123,7 +123,8 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	@Override
 	public void relinquish(ComponentInterf c) throws RemoteException {
 		// TODO Auto-generated method stub
-		
+		this.CS = false;
+		this.grant_Set.remove(c.getClockId());	
 	}
 	
 	@Override
@@ -139,6 +140,11 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	public void removeHead() throws RemoteException {
 		// TODO Auto-generated method stub
 		this.r_Q.poll();
+	}
+
+	@Override
+	public int getClockId() {
+		return this.clockValue.getId();
 	}
 
 }

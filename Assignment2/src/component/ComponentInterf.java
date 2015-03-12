@@ -30,4 +30,6 @@ public interface ComponentInterf extends Remote {
 	public void release() throws RemoteException;
 	
 	public void removeHead() throws RemoteException;
+	
+	public int getClockId();
 }
