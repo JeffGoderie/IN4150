@@ -27,6 +27,8 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	private int grantedID;
 	private boolean granted;
 	private boolean CS;
+	private int CS_counter;
+	private int CS_threshold; 
 	
 	public Component(Integer[] qs, int i, int t) throws RemoteException {
 		super();
@@ -38,12 +40,12 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 		this.granted = false;
 		this.grant_Set = new ArrayList<Integer>();
 		this.CS = false;
-		// TODO Auto-generated constructor stub
+		this.CS_counter = 0;
+		this.CS_threshold = (int)(Math.random()*100);
 	}
 
 	@Override
 	public void setRegistrySet(ComponentInterf[] c) throws RemoteException {
-		// TODO Auto-generated method stub
 		this.registry_Set = c;
 	}
 	
@@ -129,7 +131,6 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	
 	@Override
 	public void release() throws RemoteException {
-		// TODO Auto-generated method stub
 		this.CS = false;
 		for(ComponentInterf c : request_Set){
 			c.removeHead();
@@ -138,13 +139,23 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	
 	@Override
 	public void removeHead() throws RemoteException {
-		// TODO Auto-generated method stub
 		this.r_Q.poll();
 	}
 
 	@Override
-	public int getClockId() {
+	public int getClockId() throws RemoteException {
 		return this.clockValue.getId();
+	}
+
+	@Override
+	public boolean updateCounter() throws RemoteException {
+		this.CS_counter++;
+		if (this.CS_counter>=this.CS_threshold){
+			this.CS_counter = 0;
+			this.release();
+			return true;
+		}
+		return false;
 	}
 
 }

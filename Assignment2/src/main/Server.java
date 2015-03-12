@@ -13,14 +13,17 @@ import component.ComponentInterf;
 
 public class Server {
 	
-	private static int Port = 8017;
+	public Registry registry;
+	public int clientAmount;
+	private int Port = 8017;
+	public ComponentInterf[] RMI_IDS;
 	
-	public static void main(String[] args) throws AlreadyBoundException, NotBoundException, IOException{
-		Registry registry = LocateRegistry.createRegistry(Port);
+	public void main() throws AlreadyBoundException, NotBoundException, IOException{
+		registry = LocateRegistry.createRegistry(Port);
 		
 		Scanner a = new Scanner(System.in);
 		System.out.println("Please enter the amount of clients:");
-		int clientAmount = a.nextInt();
+		clientAmount = a.nextInt();
 		System.out.println("Please enter request set size (between " + (int) Math.ceil(Math.sqrt(clientAmount)) + " and " + clientAmount + ").");
 		int setSize = a.nextInt();
 		while (setSize > clientAmount || setSize < Math.ceil(Math.sqrt(clientAmount))){
@@ -54,13 +57,14 @@ public class Server {
 		}		
 
 		setRegistry();
+		totalRequest();
 		
 		System.out.println("started");
 	}
 	
-	public static void setRegistry() throws RemoteException, NotBoundException{
-		Registry registry = LocateRegistry.getRegistry("localhost", Port);
-		ComponentInterf[] RMI_IDS = new ComponentInterf[registry.list().length];
+	public void setRegistry() throws RemoteException, NotBoundException{
+		registry = LocateRegistry.getRegistry("localhost", Port);
+		RMI_IDS = new ComponentInterf[registry.list().length];
 		for(int i=0; i<registry.list().length; i++){
 			RMI_IDS[i] = (ComponentInterf) registry.lookup(registry.list()[i]);
 		}
@@ -68,6 +72,20 @@ public class Server {
 			RMI_IDS[i].setRegistrySet(RMI_IDS);
 			RMI_IDS[i].setRequestSet(RMI_IDS);
 			RMI_IDS[i].setName(registry.list()[i]);
+		}
+	}
+	
+	public  void totalRequest() throws RemoteException, NotBoundException{
+		for(int i = 0; i<RMI_IDS.length; i++){
+			ComponentInterf RMI = RMI_IDS[i];
+			new Thread ( () -> {					
+				try {
+					Thread.sleep((int)(Math.random()*500));
+					RMI.request();
+				} catch (Exception e) {
+					e.printStackTrace();
+	 	 		}
+			}).start();
 		}
 	}
 }
