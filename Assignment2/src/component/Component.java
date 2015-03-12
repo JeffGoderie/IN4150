@@ -29,6 +29,8 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	private boolean CS;
 	private int CS_counter;
 	private int CS_threshold; 
+	private boolean inquired;
+	public ArrayList<ComponentInterf> inquirers; 
 	
 	public Component(Integer[] qs, int i, int t) throws RemoteException {
 		super();
@@ -42,6 +44,8 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 		this.CS = false;
 		this.CS_counter = 0;
 		this.CS_threshold = (int)(Math.random()*100);
+		this.inquirers = new ArrayList<ComponentInterf>();
+		this.inquired = false;
 	}
 
 	@Override
@@ -106,7 +110,14 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 		grant_Set.add(i);
 		if(grant_Set.containsAll(Arrays.asList(registry_Set))){
 			//Access CS
-			this.CS = true;
+			if(inquired==false){
+				this.CS = true;
+			}else{
+				for(ComponentInterf c : this.inquirers){
+					this.relinquish(c);
+					this.inquirers.remove(c);
+				}
+			}
 		}
 	}
 	
@@ -119,13 +130,15 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	@Override
 	public void inquire(ComponentInterf c) throws RemoteException {
 		// TODO Auto-generated method stub
-		
+		c.addInquirer(c);
+		relinquish(this);
 	}
 
 	@Override
 	public void relinquish(ComponentInterf c) throws RemoteException {
 		// TODO Auto-generated method stub
 		this.CS = false;
+		this.CS_counter = 0;
 		this.grant_Set.remove(c.getClockId());	
 	}
 	
@@ -150,12 +163,19 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	@Override
 	public boolean updateCounter() throws RemoteException {
 		this.CS_counter++;
-		if (this.CS_counter>=this.CS_threshold){
-			this.CS_counter = 0;
-			this.release();
-			return true;
+		if(this.CS){
+			if (this.CS_counter>=this.CS_threshold){
+				this.CS_counter = 0;
+				this.release();
+				return true;
+			}
 		}
 		return false;
+	}
+
+	@Override
+	public void addInquirer(ComponentInterf c) throws RemoteException {
+		this.inquirers.add(c);
 	}
 
 }

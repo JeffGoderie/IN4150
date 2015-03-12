@@ -35,4 +35,6 @@ public interface ComponentInterf extends Remote {
 	
 	public boolean updateCounter() throws RemoteException;
 	
+	public void addInquirer(ComponentInterf c) throws RemoteException;
+	
 }
