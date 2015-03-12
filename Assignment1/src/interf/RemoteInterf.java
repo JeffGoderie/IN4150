@@ -20,9 +20,7 @@ public interface RemoteInterf extends Remote{
 	
 	public void setRegister(RemoteInterf[] RDS) throws RemoteException;
 	
-	public boolean isLoginValid(String username) throws RemoteException;
-	
-	public String broadcast() throws RemoteException, InterruptedException, FileNotFoundException,UnsupportedEncodingException;
+	public void broadcast() throws RemoteException, InterruptedException, FileNotFoundException,UnsupportedEncodingException;
 	
 	public void receive(Message msg, RemoteInterf origin) throws RemoteException, InterruptedException;
 

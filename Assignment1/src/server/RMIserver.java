@@ -17,7 +17,7 @@ public class RMIserver {
 	public static void main(String[] args) throws AlreadyBoundException, NotBoundException, IOException{
 		Registry registry = LocateRegistry.createRegistry(Constant.RMI_PORT);
 		
-		BufferedReader br = new BufferedReader(new FileReader("tests/two_clients.txt"));
+		BufferedReader br = new BufferedReader(new FileReader("tests/clients.txt"));
 		String line = "";
 		while ((line = br.readLine()) != null) {
 			registry.bind(line, new RemoteInterfImpl());

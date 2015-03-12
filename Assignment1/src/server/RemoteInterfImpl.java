@@ -23,79 +23,51 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 	private RemoteInterf[] RD;
 	private int ack_count;
 	private AtomicInteger Rec;
-	private AtomicInteger Ack;
 	
 	protected RemoteInterfImpl() throws RemoteException {
 		super();
 		this.msg_q = new MessageQueue();
 		// TODO Auto-generated constructor stub
 	}
-
-	@Override
-	public boolean isLoginValid(String username) throws RemoteException {
-		if(username.equals("test"))
-			return true;
-		return false;
-	}
 	
 	@Override
-	public String broadcast() throws RemoteException, InterruptedException, FileNotFoundException, UnsupportedEncodingException {		
+	public void broadcast() throws RemoteException, InterruptedException, FileNotFoundException, UnsupportedEncodingException {		
 		String output="";
-		if(msg_q.peek()==null){
-			return "";
+		if(msg_q.peek()!=null){
+			Rec = new AtomicInteger(RD.length);
+			for(int i=0; i<RD.length; i++){
+				RemoteInterf RDi = RD[i];
+				new Thread ( () -> {			
+					try {
+						//Thread.sleep(10000);
+						RDi.receive(msg_q.peek(), this);
+						Rec.getAndDecrement();
+					} catch (Exception e) {
+						e.printStackTrace();
+		 	 		}		
+				}).start();
+				
+			}
+			while(this.Rec.get() > 0){
+				Thread.sleep(1);
+			}
+			if(this.ack_count==RD.length){
+				Message sent = msg_q.poll();
+				System.out.println("Message: '"+sent+"' has been delivered.");
+				this.ack_count = 0;
+			}
+			else{
+				this.ack_count = 0;
+			}
 		}
-		Rec = new AtomicInteger(RD.length);
-		for(int i=0; i<RD.length; i++){
-			RemoteInterf RDi = RD[i];
-			new Thread ( () -> {			
-				try {
-					//Thread.sleep(10000);
-					RDi.receive(msg_q.peek(), this);
-					Rec.getAndDecrement();
-				} catch (Exception e) {
-					e.printStackTrace();
-	 	 		}		
-			}).start();
-			
-		}
-		while(this.Rec.get() > 0){
-			Thread.sleep(100);
-		}
-		if(this.ack_count==RD.length){
-			output = "Message: '"+msg_q.peek()+"' has been delivered.";
-			System.out.println(output);
-			msg_q.poll();
-			this.ack_count = 0;
-		}
-		else{
-			this.ack_count = 0;
-		}
-		return output;
 	}
 	
 	public void receive(Message msg, RemoteInterf origin) throws RemoteException, InterruptedException{
-		Ack = new AtomicInteger(RD.length);
+		//Check whether message is at the head of the message queue
 		if(msg.timestamp.smallerThan(this.getHead())){
 			for(int i=0; i<RD.length; i++){
-				RemoteInterf RDi = RD[i];
-				new Thread ( () -> {
-				
-					try {
-						RDi.acknowledge(msg, origin);
-						Ack.getAndDecrement();
-					} catch (Exception e) {
-						e.printStackTrace();
-		 	 		}
-				
-				
-				}).start();
+				RD[i].acknowledge(msg, origin);
 			}
-		}
-		else{
-			Ack.getAndDecrement();
-		}
-		while(Ack.get()>0){
-			Thread.sleep(100);
 		}
 	}
 	
@@ -110,6 +82,7 @@ public class RemoteInterfImpl extends UnicastRemoteObject implements RemoteInter
 		this.RD = RDS;
 	}
 
+	//Not completely failsafe, would have been better to use identifiers instead of name (duplicate client names are allowed)
 	@Override
 	public void acknowledge(Message msg, RemoteInterf origin) throws RemoteException {
 		if(this.getName().equals(origin.getName())){

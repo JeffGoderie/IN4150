@@ -14,8 +14,8 @@ public class MessageQueue {
 		return message_queue.peek();
 	}
 	
-	public void poll(){
-		message_queue.poll();
+	public Message poll(){
+		return message_queue.poll();
 	}
 	
 	public void add(Message msg){

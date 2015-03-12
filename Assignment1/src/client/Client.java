@@ -50,8 +50,8 @@ public class Client {
 				RemoteInterf RDi = RMI_IDS[i];
 				new Thread ( () -> {					
 					try {
-						
-						String output = RDi.broadcast();
+						Thread.sleep((int)(Math.random()*500));
+						RDi.broadcast();
 						runs.getAndDecrement();
 
 					} catch (Exception e) {
