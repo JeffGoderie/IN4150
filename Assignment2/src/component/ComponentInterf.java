@@ -3,6 +3,7 @@ package component;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import clocks.ScalarClock;
 import request.Request;
 
 public interface ComponentInterf extends Remote {
@@ -11,21 +12,25 @@ public interface ComponentInterf extends Remote {
 	
 	public void setRequestSet(ComponentInterf[] c) throws RemoteException;
 	
-	public void setName(String n) throws RemoteException;
+	public void request() throws RemoteException, InterruptedException;
 	
-	public void request() throws RemoteException;
-	
-	public void receiveRequest(Request r) throws RemoteException;
+	public void receiveRequest(Request r, ComponentInterf c) throws RemoteException, InterruptedException;
 	
 	public void grant(ComponentInterf c) throws RemoteException;
 	
-	public void receiveGrant(int i) throws RemoteException;
+	public void receiveGrant() throws RemoteException;
 	
 	public void postpone(ComponentInterf c) throws RemoteException;
 	
-	public void inquire(ComponentInterf c) throws RemoteException;
+	public void receivePostpone() throws RemoteException;
+	
+	public void receiveInquire(ComponentInterf c) throws RemoteException, InterruptedException;
+	
+	public void inquire(ComponentInterf c) throws RemoteException, InterruptedException;
 	
 	public void relinquish(ComponentInterf c) throws RemoteException;
+	
+	public void receiveRelinquish(ComponentInterf c) throws RemoteException;
 	
 	public void release() throws RemoteException;
 	
@@ -33,8 +38,6 @@ public interface ComponentInterf extends Remote {
 	
 	public int getClockId() throws RemoteException;
 	
-	public boolean updateCounter() throws RemoteException;
-	
-	public void addInquirer(ComponentInterf c) throws RemoteException;
+	public ScalarClock getClock() throws RemoteException;
 	
 }

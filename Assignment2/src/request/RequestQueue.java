@@ -1,7 +1,5 @@
 package request;
 import java.util.PriorityQueue;
-import java.io.*;
-import clocks.*;
 
 public class RequestQueue {
 	public PriorityQueue<Request> message_queue;
@@ -20,5 +18,9 @@ public class RequestQueue {
 	
 	public void add(Request msg){
 		message_queue.add(msg);
+	}
+	
+	public void remove(Request msg){
+		message_queue.remove(msg);
 	}
 }

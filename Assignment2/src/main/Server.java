@@ -6,7 +6,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import component.Component;
 import component.ComponentInterf;
@@ -46,14 +48,16 @@ public class Server {
 		setSize = 3;
 		
 		Integer[][] sets = {{0,1,2},{1,4,6},{2,3,4},{0,3,6},{0,4,5},{1,3,5},{2,5,6}};
+		Integer[] times = {1,10,8,3,9,6,5};
+		AtomicInteger stepCounter = new AtomicInteger(0);
 		
-		
+
 		for(int i=0; i<clientAmount; i++){
 			//int[] set = new int[setSize];
 			//for(int j=0; j<setSize; j++){
 			//	set[j] = (i+j)%clientAmount;
 			//}
-			registry.bind("Client"+(i+1), new Component(sets[i], (int)(Math.random()*clientAmount*2) , i));
+			registry.bind("Client"+(i+1), new Component(sets[i], i, times[i], stepCounter));
 		}		
 
 		setRegistry();
@@ -71,7 +75,6 @@ public class Server {
 		for(int i=0; i<RMI_IDS.length; i++){
 			RMI_IDS[i].setRegistrySet(RMI_IDS);
 			RMI_IDS[i].setRequestSet(RMI_IDS);
-			RMI_IDS[i].setName(registry.list()[i]);
 		}
 	}
 	
@@ -80,7 +83,7 @@ public class Server {
 			ComponentInterf RMI = RMI_IDS[i];
 			new Thread ( () -> {					
 				try {
-					Thread.sleep((int)(Math.random()*500));
+					//Thread.sleep((int)(Math.random()*50));
 					RMI.request();
 				} catch (Exception e) {
 					e.printStackTrace();
