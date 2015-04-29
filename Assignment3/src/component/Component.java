@@ -34,13 +34,40 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 
 	@Override
 	public void receive(int level, int id) {
-		// TODO Auto-generated method stub
+		/* Psuedocode from slides
+		while (untraversed )= ∅) do
+			link ← any untraversed link
+			send(level,id) on link
+			R: receive(level’,id’) on link’
+				if ((id=id’) and (killed=false)) then
+					level ← level+1
+					untraversed ← untraversed \ link
+				else
+					if ((level’,id’) < (level,id)) then goto R
+					else
+						send(level’,id’) on link’
+						killed ← true
+						goto R
+		if (killed = false) then elected ← true
+		 */
 		
 	}
 
 	@Override
 	public void send(int level, int id) {
-		// TODO Auto-generated method stub
-		
+		/*Psuedocode from slides
+	 do forever
+		receive(level’,id’) on link’
+		case (level’,id’) of
+			(level’,id’) < (level,owner-id): ignore
+			(level’,id’) > (level,owner-id):
+				potential-owner ← link’
+				(level,owner-id) ← (level’,id’)
+				if (owner=nil) then owner ← potential-owner
+				send(level’,id’) on owner-link
+			(level’,id’) = (level,owner-id):
+				owner ← potential-owner
+				send(level’,id’) on owner-link
+		 */		
 	}
 }
