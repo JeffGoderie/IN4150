@@ -2,17 +2,28 @@ package component;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 
 public class Component extends UnicastRemoteObject implements ComponentInterf{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8751606033453633216L;
-
-	protected Component() throws RemoteException {
-		super();
-		// TODO Auto-generated constructor stub
+	private static final long serialVersionUID = 1L;
+	public ArrayList<Link> traversed; 
+	public boolean killed; 
+	public int level;
+	public Link owner;
+	public Link potential_owner;
+	public int id;
+	boolean candidate;
+	
+	protected Component(ArrayList<Component> components, boolean new_candidate, int new_id) throws RemoteException {
+		killed 	= false;
+		owner 	= null;
+		candidate = new_candidate;
+		potential_owner = null;
+		id 		= new_id;
+		level 	= 0;
+		
+		for (Component component : components)
+			traversed.add(new Link(component, this));
 	}
 
 	@Override
@@ -22,83 +33,14 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	}
 
 	@Override
-	public void setRequestSet(ComponentInterf[] c) throws RemoteException {
+	public void receive(int level, int id) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void request() throws RemoteException, InterruptedException {
+	public void send(int level, int id) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void grant(ComponentInterf c) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void receiveGrant() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void postpone(ComponentInterf c) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void receivePostpone() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void receiveInquire(ComponentInterf c) throws RemoteException,
-			InterruptedException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void inquire(ComponentInterf c) throws RemoteException,
-			InterruptedException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void relinquish(ComponentInterf c) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void receiveRelinquish(ComponentInterf c) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void release() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeHead() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getClockId() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
 }
