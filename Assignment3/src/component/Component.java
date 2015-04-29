@@ -14,7 +14,7 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 	public int id;
 	boolean candidate;
 	
-	protected Component(ArrayList<Component> components, boolean new_candidate, int new_id) throws RemoteException {
+	public Component(ArrayList<Component> components, boolean new_candidate, int new_id) throws RemoteException {
 		killed 	= false;
 		owner 	= null;
 		candidate = new_candidate;
