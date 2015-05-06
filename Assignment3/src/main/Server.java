@@ -7,17 +7,16 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import component.Component;
+import component.CandidateComponent;
 import component.ComponentInterf;
+import component.OrdinaryComponent;
 
 public class Server {
 	
 	public Registry registry;
-	public int clientAmount;
+	public int candidateAmount;
+	public int ordinaryAmount;
 	private int Port = 8017;
 	public ComponentInterf[] RMI_IDS;
 	
@@ -25,22 +24,50 @@ public class Server {
 		registry = LocateRegistry.createRegistry(Port);
 
 		
-		clientAmount = 5;
+		candidateAmount = 15;
+		ordinaryAmount = 15;
 		
-		ArrayList<Component> components = new ArrayList<Component>();
-		for(int i=0; i<clientAmount; i++){
-			boolean new_candidate = false;
-			int new_id = i;
-			Component new_component = new Component(components,new_candidate,new_id);
+		ArrayList<ComponentInterf> components = new ArrayList<ComponentInterf>();
+		for(int i=0; i<candidateAmount; i++){
+			CandidateComponent new_component = new CandidateComponent(i+10);
 			components.add(new_component);
-			registry.bind("Node"+(i+1), new_component );
-		}		
+			registry.bind("CC"+(i+1), new_component );
+		}
+		for(int i=0; i<ordinaryAmount; i++){
+			OrdinaryComponent new_component = new OrdinaryComponent();
+			components.add(new_component);
+			registry.bind("OC"+(i+1), new_component );
+		}	
 		
-		System.out.println("started");
+		new Thread ( () -> {					
+			try {
+				System.out.println("started");
+				//Thread.sleep((int)(Math.random()*50));
+				setRegistry();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}).start();
+		
+		
 	}
 	
-    public int roll() {
-    	return (int)(Math.random()*6) + 1;
-    }
-	
+	public void setRegistry() throws RemoteException, NotBoundException{
+		//registry = LocateRegistry.getRegistry("localhost", Port);
+		RMI_IDS = new ComponentInterf[registry.list().length];
+		for(int i=0; i<registry.list().length; i++){
+			RMI_IDS[i] = (ComponentInterf) registry.lookup(registry.list()[i]);
+		}
+		for(int i=0; i<RMI_IDS.length; i++){
+			ComponentInterf RMI_ID_SELECTED = RMI_IDS[i];
+			new Thread ( () -> {					
+				try {
+					Thread.sleep((int)(Math.random()*50));
+					RMI_ID_SELECTED.setRegistrySet(RMI_IDS);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}).start();
+		}
+	}
 }
