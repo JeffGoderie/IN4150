@@ -114,10 +114,10 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 		
 		if(!granted){
 			this.r_Q.add(r);
+			this.granted = true;
 			this.grantedComponent = c;
 			this.grantedRequest = r;
 			this.grant(c);
-			this.granted = true;
 		}
 		else{
 			
