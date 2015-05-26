@@ -113,6 +113,7 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 		//System.out.println("Process " + this.getClockId() + " has received request from Process " + c.getClockId());
 		
 		if(!granted){
+			this.granted = true;
 			this.r_Q.add(r);
 			this.granted = true;
 			this.grantedComponent = c;
@@ -173,6 +174,7 @@ public class Component extends UnicastRemoteObject implements ComponentInterf{
 			catch(IOException e){
 				
 			}
+			System.out.println(this.getClockId() + " Released");
 			//System.out.println(this.getClockId());
 			for(ComponentInterf c: request_Set){
 				c.release();
